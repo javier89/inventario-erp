@@ -1,0 +1,106 @@
+# ======================================================
+#  NODE + PNPM + TYPESCRIPT/JAVASCRIPT
+# ======================================================
+node_modules/
+.pnpm-cache/
+.pnpm-store/
+dist/
+build/
+tmp/
+temp/
+
+# ======================================================
+#  LOGS
+# ======================================================
+logs/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ======================================================
+#  ENVIRONMENT VARIABLES
+# ======================================================
+.env
+.env.*
+!.env.example    # <- mantén un ejemplo
+
+# ======================================================
+#  PRISMA
+# ======================================================
+# Prisma Client
+prisma/generated/
+prisma/client/
+# Migrations (solo si NO quieres versionar)
+# Si quieres versionarlas, elimina esta línea:
+prisma/migrations/
+
+# ======================================================
+#  DATABASE
+# ======================================================
+*.db
+*.sqlite
+*.db-journal
+db/*.sql
+dump.sql
+mysql-data/
+docker-mysql/data/
+
+# ======================================================
+#  TESTING
+# ======================================================
+coverage/
+coverage-final.json
+.nyc_output/
+jest-cache/
+jest-report/
+test-results/
+artillery-report/
+k6-results/
+*.test.db
+
+# Snapshots (si no quieres versionarlos)
+# __snapshots__/
+
+# ======================================================
+#  DOCKER
+# ======================================================
+.docker/
+docker-cache/
+docker-temp/
+docker-compose.override.yml
+
+# ======================================================
+#  EDITOR / OS FILES
+# ======================================================
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# ======================================================
+#  UPLOADS / STORAGE (ERP)
+# ======================================================
+uploads/
+storage/
+public/storage/
+files/
+exports/
+reports/
+
+# ======================================================
+#  GRAPHQL
+# ======================================================
+# Generated schema or types
+schema.graphql
+graphql/generated/
+graphql/types/
+
+# ======================================================
+#  BUILD ARTIFACTS / BUNDLERS
+# ======================================================
+.eslintcache
+.prettiercache
