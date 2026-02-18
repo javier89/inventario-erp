@@ -1,0 +1,132 @@
+generator client {
+  provider = "prisma-client-js"
+  seed     = "node ../seed/seed.js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Categoria {
+  id_categoria Int         @id @default(autoincrement())
+  nombre       String?     @db.VarChar(100)
+  descripcion  String?     @db.Text
+  Productos    Productos[]
+}
+
+model Compra {
+  id_compra      Int             @id
+  fecha_compra   DateTime?       @default(now()) @db.DateTime(0)
+  total_compra   Float?          @db.Float
+  num_factura    String?         @db.VarChar(100)
+  form_pago      String?         @db.VarChar(100)
+  Proveedor      Proveedor       @relation(fields: [id_compra], references: [id_proveedor], onDelete: Cascade, map: "fk_proveedor_compra")
+  Detalle_Compra Detalle_Compra?
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model Detalle_Compra {
+  id_detalle      Int       @id @default(autoincrement())
+  cantidad        Int?
+  precio_producto Decimal   @db.Decimal(5, 2)
+  estado_compra   String?   @db.VarChar(100)
+  costo_total     Decimal   @db.Decimal(5, 2)
+  Compra          Compra    @relation(fields: [id_detalle], references: [id_compra], onDelete: Cascade, map: "fk_compra_detalle")
+  Producto        Productos @relation(fields: [id_detalle], references: [id_producto], onDelete: Cascade, map: "fk_producto _detalle")
+}
+
+model Empleado {
+  id_empleado Int     @id @default(autoincrement())
+  nombre      String? @db.VarChar(100)
+  cargo       String? @db.VarChar(50)
+}
+
+model HistorialPrecio {
+  id_historial    Int       @id @default(autoincrement())
+  id_producto     Int
+  precio_producto Decimal   @db.Decimal(5, 2)
+  Productos       Productos @relation(fields: [id_producto], references: [id_producto], map: "fk_historial_producto")
+
+  @@index([id_producto], map: "fk_historial_producto")
+}
+
+model Motivo {
+  id_motivo   Int     @id @default(autoincrement())
+  nombre      String? @db.VarChar(100)
+  descripcion String? @db.VarChar(100)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model Movimiento {
+  id_movimiento    Int                        @id @default(autoincrement())
+  fecha_movimiento DateTime?                  @default(now()) @db.DateTime(0)
+  tipo_movimiento  Movimiento_tipo_movimiento
+  cantidad         Int
+  stock_anterior   Int
+  stock_nuevo      Int
+  id_producto      Int
+  id_empleado      Int
+  Productos        Productos                  @relation(fields: [id_producto], references: [id_producto], onDelete: Cascade, onUpdate: NoAction, map: "fk_mov_producto")
+
+  @@index([id_producto], map: "fk_mov_producto")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model Productos {
+  id_producto     Int               @id @default(autoincrement())
+  nombre          String            @db.VarChar(100)
+  id_categoria    Int?
+  id_proveedor    Int?
+  codigo_barras   String?           @db.VarChar(100)
+  stock           Int               @default(0)
+  sku             String            @unique(map: "sku")
+  unidad_medida   String?           @db.VarChar(80)
+  ubicacion       String?           @db.VarChar(100)
+  Detalle_Compra  Detalle_Compra?
+  HistorialPrecio HistorialPrecio[]
+  Movimiento      Movimiento[]
+  Categoria       Categoria?        @relation(fields: [id_categoria], references: [id_categoria], onDelete: Cascade, map: "fk_categoria_producto")
+  Proveedor       Proveedor?        @relation(fields: [id_proveedor], references: [id_proveedor], map: "fk_proveedor_producto")
+
+  @@index([id_categoria], map: "fk_categoria_producto")
+  @@index([id_proveedor], map: "fk_proveedor_producto")
+}
+
+model Proveedor {
+  id_proveedor    Int         @id @default(autoincrement())
+  nombre          String?     @db.VarChar(100)
+  telefono        String?     @db.VarChar(20)
+  direccion       String?     @db.VarChar(200)
+  email           String?     @db.VarChar(100)
+  rfc             String?     @unique(map: "rfc") @db.VarChar(20)
+  contacto_ventas String?     @db.VarChar(100)
+  estado          String?     @db.VarChar(100)
+  Compra          Compra?
+  Productos       Productos[]
+}
+
+model Rol {
+  id_rol       Int       @id @default(autoincrement())
+  descriptcion String?   @db.VarChar(100)
+  nombre       String?   @unique @db.VarChar(100)
+  Usuario      Usuario[]
+}
+
+model Usuario {
+  id_usuario    Int     @id @default(autoincrement())
+  usuario       String? @unique @db.VarChar(50)
+  nombre        String?
+  password_hash String? @db.VarChar(256)
+  estado        String? @default("Activo") @db.VarChar(50)
+  id_rol        Int
+  Rol           Rol     @relation(fields: [id_rol], references: [id_rol], map: "fk_usuario_rol")
+
+  @@index([id_rol], map: "fk_usuario_rol")
+}
+
+enum Movimiento_tipo_movimiento {
+  ENTRADA
+  SALIDA
+  AJUSTES
+}
