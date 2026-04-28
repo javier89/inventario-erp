@@ -1,17 +1,119 @@
 import { GraphQLError } from 'graphql';
-import prisma from '../../config/prisma/prismaClient.js';
+//import prisma from '../../config/prisma/prismaClient.js';
 
 const resolvers ={
     
     Query:{
-        productos: async()=>{
-            return prisma.productos.findMany();
+        productos: async(_, { page, pageSize, filters, orderBy }, { prisma}) => {
+                
+            const skip = (page-1) * pageSize;
+            const take = Math.min(pageSize, 50);
+
+            const {
+                search,
+                nombre,
+                sku,
+                stockMin,
+                stockMax,
+                precioMin,
+                precioMax,
+                activo= true,
+            } = filters || {};
+
+            const searchCondition = search ?{
+                OR: [
+                     {nombre: {contains: search, mode:"insensitive"}},
+                     {sku:{contains: search, mode:"insensitive"}},
+                ],
+            }
+            : {};
+
+            const where = {
+                activo,
+                ...searchCondition,
+                ...(nombre && {
+                    nombre: {contains: nombre, mode:"insensitive"},
+                }),
+                ...(sku && { sku }),
+                ...((stockMin !== undefined || stockMax !== undefined) && {
+                    stock:{
+                        ...(stockMin !== underfined && {gte: stockMin}),
+                        ...(stockMax !== underfined && {lte: stockMax}),
+                    },
+                }),
+            };
+
+            const include = {
+                HistorialPrecio:{
+                    orderBy:{ fecha:"desc"},
+                    take: 1,
+                },
+            };
+
+            let prismaOrderBy={id_producto:"desc"};
+            if(orderBy && orderBy.field !== "precio"){
+                prismaOrderBy ={
+                    [orderBy.field]: orderBy.direction || "desc",
+                };
+            }
+
+            const[productos, total]=await Promise.all([
+                prisma.productos.findMany({
+                    where,
+                    include,
+                    skip,
+                    take,
+                    orderBy: prismaOrderBy,
+                }),
+                prisma.productos.count({ where }),
+            ]);
+
+            let data = productos.map(p => ({
+                ...p,
+                precio_actual: p.HistorialPrecio[0]?.precio || null,
+            }));
+
+            if(precioMin !== undefined || precioMax !== undefined){
+                data = data.filter( p => {
+                    if(p.precio_actual === null) return false;
+                    return (
+                        (precioMin === undefined || p.precio_actual >= precioMin) &&
+                        (precioMax === undefined || p.precio_actual <= precioMax)
+                    );
+                });
+            }
+
+            if(orderBy?.field === "precio"){
+                data.sort((a, b)=>{
+                    const dir = orderBy.direction === "asc"?1:-1;
+                    return (a.precio_actual - b.precio_actual)*dir;
+                });
+            }
+            return{
+                data,
+                total,
+                page,
+                pageSize,
+                totalPage: Math.ceil(total/pageSize),
+            };
+            
         },
 
-        producto: async(_, {id_producto}) =>{
-            return prisma.productos.findUnique({
-                where: {id_producto: Number(id_producto)},
+        // Metoso Para un solo Producto
+        producto: async(_, {id_producto},{prisma}) => {
+            if(!id_producto){
+                throw new  GraphQLError("El producto es obligatorio")
+            }
+            const producto= await prisma.productos.findFirst({
+                where:{
+                    id_producto: Number(id_producto),
+                    activo: true
+                },
             });
+            if(!producto){
+                throw new GraphQLError("Producto no Encontrado o Inactivo");
+            }
+            return producto;
         },
     },
 
@@ -65,15 +167,21 @@ const resolvers ={
             }
         },
         actualizarProducto: async ( _, {sku, data }) =>{
-            const { sku: skuIgnorado, ...dataSinSku} = data
+            if(!sku){
+                throw new GraphQLError("El SKU es Obligatorio");
+            }
+            // const { sku: _, ...dataSinSku } = data;
+
+            const { sku: skuIgnorado, ...dataSinSku } = data;
             
             return prisma.productos.update({
-                where: {sku:sku},
+                where: { sku },
                 data: dataSinSku,
             });
         },
 
-        actualizarProductoPorSku: async (_,{sku, data},{prisma}) =>{
+        //Revisar esto antes en 1 min
+        actualizarProductoPorSku: async (_,{sku,data},{prisma, user}) =>{
             //Verificar si existe 
             const productoExistente = await prisma.productos.findUnique({
                 where:{sku}
@@ -89,10 +197,18 @@ const resolvers ={
             return productoActualizado;
         },
         
-        eliminarProducto:async(_, {id})=>
+        eliminarProducto: async(_, {id_producto}, {prisma})=>
         {
+            const productos = await prisma.productos.findUnique({
+                where:{id_producto: Number(id_producto)},
+            });
+
+            if(!id_producto){
+                throw new  Error("Seleccionar el Producto es Obligatorio");
+            }
+
             await prisma.productos.update({
-                where: {id_producto:Number(id)},
+                where: {id_producto: Number(id_producto) },
                 data: {activo: false},
             });
             return true;
@@ -100,6 +216,6 @@ const resolvers ={
     },
 };
 
-console.log(Object.keys(prisma));
+//console.log(Object.keys(prisma));
 
 export default resolvers;
