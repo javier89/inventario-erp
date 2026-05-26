@@ -35,6 +35,8 @@ prisma/client/
 # Migrations (solo si NO quieres versionar)
 # Si quieres versionarlas, elimina esta línea:
 prisma/migrations/
+prisma/dev.db
+prisma/dev.db-journal
 
 # ======================================================
 #  DATABASE
