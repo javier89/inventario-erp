@@ -1,4 +1,4 @@
-import prisma from "../config/prisma/prismaClient.js";
+import prisma from "../config/prismaClient.js";
 import jwt  from 'jsonwebtoken';
 
 export const context = async ({req})=>{

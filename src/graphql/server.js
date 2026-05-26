@@ -22,9 +22,9 @@ export async function startGraphQLServer (app){
         bodyParser.json(),
         expressMiddleware(server,{
             context,
-            listen: { port: 5501 },
+            // listen: { port: 5501 },
         })
     );
-    console.log(`🚀 GraphQL listo en localhost:5501`)
+    // console.log(`🚀 GraphQL listo en localhost:5501`)
 }
 

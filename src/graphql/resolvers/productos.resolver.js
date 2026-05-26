@@ -22,34 +22,36 @@ const resolvers ={
 
             const searchCondition = search ?{
                 OR: [
-                     {nombre: {contains: search, mode:"insensitive"}},
-                     {sku:{contains: search, mode:"insensitive"}},
+                     {nombre: {contains: search}},
+                     {sku:{contains: search}},
                 ],
             }
             : {};
-
+                // Where limpio
             const where = {
                 activo,
                 ...searchCondition,
                 ...(nombre && {
-                    nombre: {contains: nombre, mode:"insensitive"},
+                    nombre: {contains: nombre},
                 }),
                 ...(sku && { sku }),
                 ...((stockMin !== undefined || stockMax !== undefined) && {
                     stock:{
-                        ...(stockMin !== underfined && {gte: stockMin}),
-                        ...(stockMax !== underfined && {lte: stockMax}),
+                        ...(stockMin !== undefined && {gte: stockMin}),
+                        ...(stockMax !== undefined && {lte: stockMax}),
                     },
                 }),
             };
 
+            // incluir ultimo precio
             const include = {
                 HistorialPrecio:{
-                    orderBy:{ fecha:"desc"},
+                    orderBy:{ id_historial: "desc"},
                     take: 1,
                 },
             };
 
+            // orden dinamico
             let prismaOrderBy={id_producto:"desc"};
             if(orderBy && orderBy.field !== "precio"){
                 prismaOrderBy ={
@@ -57,6 +59,7 @@ const resolvers ={
                 };
             }
 
+            // Query principal
             const[productos, total]=await Promise.all([
                 prisma.productos.findMany({
                     where,
@@ -68,9 +71,14 @@ const resolvers ={
                 prisma.productos.count({ where }),
             ]);
 
+            // Map precio seguro
             let data = productos.map(p => ({
-                ...p,
-                precio_actual: p.HistorialPrecio[0]?.precio || null,
+                id_producto: p.id_producto,
+                nombre: p.nombre,
+                sku: p.sku,
+                stock: p.stock,
+                activo: p.activo,
+                precio_actual: p.HistorialPrecio[0]?.precio_producto ?? null,
             }));
 
             if(precioMin !== undefined || precioMax !== undefined){
@@ -83,6 +91,7 @@ const resolvers ={
                 });
             }
 
+            // ordenar por precio (manual)
             if(orderBy?.field === "precio"){
                 data.sort((a, b)=>{
                     const dir = orderBy.direction === "asc"?1:-1;
@@ -94,12 +103,12 @@ const resolvers ={
                 total,
                 page,
                 pageSize,
-                totalPage: Math.ceil(total/pageSize),
+                totalPages: Math.max(1,Math.ceil(total/pageSize)),
             };
             
         },
 
-        // Metoso Para un solo Producto
+        // Metodo Para un solo Producto
         producto: async(_, {id_producto},{prisma}) => {
             if(!id_producto){
                 throw new  GraphQLError("El producto es obligatorio")
@@ -129,7 +138,7 @@ const resolvers ={
                         unidad_medida: data.unidad_medida ?? null,
                         ubicacion: data.ubicacion ?? null,
 
-                        historialPrecio:{
+                        HistorialPrecio:{
                         create: {
                             precio_producto: data.precio,
                             // fecha: new Date(),
@@ -199,10 +208,7 @@ const resolvers ={
         
         eliminarProducto: async(_, {id_producto}, {prisma})=>
         {
-            const productos = await prisma.productos.findUnique({
-                where:{id_producto: Number(id_producto)},
-            });
-
+        
             if(!id_producto){
                 throw new  Error("Seleccionar el Producto es Obligatorio");
             }
@@ -211,6 +217,7 @@ const resolvers ={
                 where: {id_producto: Number(id_producto) },
                 data: {activo: false},
             });
+            
             return true;
         },
     },

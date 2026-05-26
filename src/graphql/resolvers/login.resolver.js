@@ -1,4 +1,4 @@
-import prisma from "../../config/prisma/prismaClient.js";
+import prisma from "../../config/prismaClient.js";
 //import prisma from "@prisma/client";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -10,15 +10,10 @@ const authResolver = {
             const user = await prisma.usuario.findUnique({
                 where: { usuario },
                 include: { 
-                    Rol:{
-                        // include:{
-                        //     permisos: true,
-                        // },
-                    },
+                    Rol: true
                 },
             });
 
-            
             if(!user || user.estado!=="Activo"){
                 throw new Error("Credenciales Invalidas");
             }
@@ -54,10 +49,10 @@ const authResolver = {
             return {
                 token,
                 usuario: {
-                    id: user.id_usuario,
+                    id_usuario: user.id_usuario,
                     usuario: user.usuario,
                     nombre: user.nombre,
-                    estado: user.estado,
+                    activo: user.estado === "Activo",
                     rol: user.Rol
                     ?{
                         nombre: user.Rol.nombre,

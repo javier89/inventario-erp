@@ -8,5 +8,3 @@ type Rol{
 `;
 
 export default rolTypeDefs;
-
-
