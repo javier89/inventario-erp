@@ -3,7 +3,8 @@ import { gql } from 'graphql-tag';
 
 const usuarioTypeDefs =  gql `
     type Usuario {
-        id: ID!
+        id_usuario: ID!
+        usuario: String!
         nombre: String!
         activo: Boolean!
         rol: Rol!

@@ -1,26 +1,43 @@
 import { gql } from 'graphql-tag';
 
 const typeDefs = gql `
+    
+    scalar DateTime
+    
     type Producto {
         id_producto: ID!
         nombre: String!
-        descripcion: String!
-        precio: Float!
-        activo: Boolean!
-        createdAt: String!
-        updatedAt: String!
+        activo: Boolean!         
         sku: String!
         stock: Int 
+        unidad: String!
         HistorialPrecio: [HistorialPrecio!]!
+        precio_producto: Float
     }
+
     type HistorialPrecio {
-        precio: Float!
+        id_historial: ID!
+        precio_producto: Float!
+        fecha: DateTime!
     }
 
     type CrearProductoResponse{
         ok: Boolean!
         message: String!
         producto: Producto
+    }
+
+    enum SortDirection{
+        asc
+        desc
+    }
+
+    type ProductoPagination{
+        data:[Producto!]!
+        total: Int!
+        page: Int!
+        pageSize: Int!
+        totalPages: Int!
     }
 
     # --------
@@ -46,14 +63,31 @@ const typeDefs = gql `
         codigo_barras: String
         stock: Int
     }
+
+    input ProductoOrderByInput{
+        field: String! # nombre | stock | precio
+        direction: SortDirection = desc
+    }
+    
+    input ProductoFilterInput{
+        search: String
+        nombre: String
+        sku: String
+        stockMin: Int
+        stockMax: Int
+        precioMin: Float
+        precioMax: Float
+        activo: Boolean = true
+    }
     
     # --------
     # Queries
     # --------
 
     extend type Query {
-        productos: [Producto!]!
-        producto(id: ID!): Producto
+        productos (page: Int=1, pageSize: Int=10, filters:ProductoFilterInput, orderBy: ProductoOrderByInput): ProductoPagination!
+        producto  (id_producto: ID!): Producto
+        
     }
     
     # --------
@@ -63,9 +97,9 @@ const typeDefs = gql `
 
     extend type Mutation {
         crearProducto(data: CrearProductoInput!): CrearProductoResponse!
-        actualizarProducto(id: ID!, data:ActualizarProductoInput!): Producto!
+        actualizarProducto(id_producto: ID!, data:ActualizarProductoInput!): Producto!
         actualizarProductoPorSku( sku: String!, data:ActualizarProductoPorSkuInput!): Producto!
-        eliminarProducto(id: ID!): Boolean!
+        eliminarProducto(id_producto: ID!): Boolean!
 
     }
 `;

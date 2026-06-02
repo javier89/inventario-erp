@@ -1,16 +1,17 @@
-import baseTypeDefs from "./base.typeDefs.js";
+// ----- Schemas -----
+import {baseTypeDefs} from "./schemas/base.schema.js";
+import productoTypeDfs from './schemas/productos.schema.js';
+import proveedorTypeDefs from "./schemas/proveedor.schema.js";
+import loginTypeDefs from "./schemas/login.schema.js";
+import usuarioTypeDefs from "./schemas/users.schema.js";
+import rolTypeDefs from "./schemas/roles.schema.js";
 
-import productoResolver from "./productos/resolvers.js";
-import productoTypeDfs from './productos/typeDefs.js';
+// ----- Resolvers -----
+import productoResolver from "./resolvers/productos.resolver.js";
+import proveedorResolver from "./resolvers/proveedor.resolver.js";
+import loginResolver   from "./resolvers/login.resolver.js";
 
-import proveedorTypeDefs from "./proveedor/typeDefs.js";
-import proveedorResolver from "./proveedor/resolvers.js";
 
-import loginTypeDefs from "./login/typeDefs.js";
-import loginResolver from "./login/resolvers.js";
-
-import usuarioTypeDefs from "./users/typeDefs.js";
-import rolTypeDefs from "./roles/typeDefs.js";
 
 export const typeDefs = [
     baseTypeDefs,
@@ -21,21 +22,18 @@ export const typeDefs = [
     loginTypeDefs,
 ];
 
-// export const resolvers=[
-//     productoResolver,
-//     proveedorResolver,
-//     loginResolver
-// ];  
+
 
 export const resolvers={
     Query: {
-        ...productoResolver.Query,
-        ...proveedorResolver.Query
+        ...(productoResolver.Query || {}),
+        ...(loginResolver.Query || {}),
+        ...(proveedorResolver.Query || {})
     },
     Mutation: {
-        ...productoResolver.Mutation,
-        ...proveedorResolver.Mutation,
-        ...loginResolver.Mutation,
+        ...(productoResolver.Mutation || {}),
+        ...(proveedorResolver.Mutation || {}),
+        ...(loginResolver.Mutation || {}),
     },
 };
 
