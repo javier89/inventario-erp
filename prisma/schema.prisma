@@ -48,6 +48,7 @@ model Empleado {
   id_empleado Int     @id @default(autoincrement())
   nombre      String? @db.VarChar(100)
   cargo       String? @db.VarChar(50)
+  activo      Boolean @default(true)
 }
 
 model HistorialPrecio {
