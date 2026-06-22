@@ -5,11 +5,18 @@ import proveedorTypeDefs from "./schemas/proveedor.schema.js";
 import loginTypeDefs from "./schemas/login.schema.js";
 import usuarioTypeDefs from "./schemas/users.schema.js";
 import rolTypeDefs from "./schemas/roles.schema.js";
-
+import salidasTypeDefs from "./schemas/salida.schema.js";
+import empleadosTypeDefs from "./schemas/empleados.schema.js";
+import movimientosTypeDefs from "./schemas/movimientos.schema.js"
+import asignacionesTypeDefs from "./schemas/asignaciones.schema.js";
 // ----- Resolvers -----
 import productoResolver from "./resolvers/productos.resolver.js";
 import proveedorResolver from "./resolvers/proveedor.resolver.js";
 import loginResolver   from "./resolvers/login.resolver.js";
+import salidasResolver from "./resolvers/salida.resolver.js";
+import empleadosResolver from "./resolvers/empleados.resolver.js";
+import movimientosResolver from "./resolvers/movimientos.resolver.js";
+import asignacionesResolver from "./resolvers/asignaciones.resolver.js";
 
 
 
@@ -20,6 +27,10 @@ export const typeDefs = [
     productoTypeDfs,
     proveedorTypeDefs,
     loginTypeDefs,
+    salidasTypeDefs,
+    empleadosTypeDefs,
+    movimientosTypeDefs,
+    asignacionesTypeDefs
 ];
 
 
@@ -28,12 +39,20 @@ export const resolvers={
     Query: {
         ...(productoResolver.Query || {}),
         ...(loginResolver.Query || {}),
-        ...(proveedorResolver.Query || {})
+        ...(proveedorResolver.Query || {}),
+        ...(salidasResolver.Query || {}),
+        ...(empleadosResolver.Query || {}),
+        ...(movimientosResolver.Query || {}),
+        ...(asignacionesResolver.Query || {}),
     },
     Mutation: {
         ...(productoResolver.Mutation || {}),
         ...(proveedorResolver.Mutation || {}),
         ...(loginResolver.Mutation || {}),
+        ...(salidasResolver.Mutation || {}),
+        ...(empleadosResolver.Mutation || {}),
+        ...(movimientosResolver.Mutation || {}),
+        ...(asignacionesResolver.Mutation || {}),
     },
 };
 
