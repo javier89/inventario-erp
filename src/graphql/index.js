@@ -9,6 +9,8 @@ import salidasTypeDefs from "./schemas/salida.schema.js";
 import empleadosTypeDefs from "./schemas/empleados.schema.js";
 import movimientosTypeDefs from "./schemas/movimientos.schema.js"
 import asignacionesTypeDefs from "./schemas/asignaciones.schema.js";
+import comprasTypeDefs from "./schemas/compras.schema.js";
+    
 // ----- Resolvers -----
 import productoResolver from "./resolvers/productos.resolver.js";
 import proveedorResolver from "./resolvers/proveedor.resolver.js";
@@ -17,6 +19,7 @@ import salidasResolver from "./resolvers/salida.resolver.js";
 import empleadosResolver from "./resolvers/empleados.resolver.js";
 import movimientosResolver from "./resolvers/movimientos.resolver.js";
 import asignacionesResolver from "./resolvers/asignaciones.resolver.js";
+import comprasResolver from "./resolvers/compras.resolver.js"
 
 
 
@@ -30,7 +33,8 @@ export const typeDefs = [
     salidasTypeDefs,
     empleadosTypeDefs,
     movimientosTypeDefs,
-    asignacionesTypeDefs
+    asignacionesTypeDefs,
+    comprasTypeDefs,
 ];
 
 
@@ -44,6 +48,7 @@ export const resolvers={
         ...(empleadosResolver.Query || {}),
         ...(movimientosResolver.Query || {}),
         ...(asignacionesResolver.Query || {}),
+        ...(comprasResolver.Query || {}),
     },
     Mutation: {
         ...(productoResolver.Mutation || {}),
@@ -53,6 +58,7 @@ export const resolvers={
         ...(empleadosResolver.Mutation || {}),
         ...(movimientosResolver.Mutation || {}),
         ...(asignacionesResolver.Mutation || {}),
+        ...(comprasResolver.Mutation || {}),
     },
 };
 
