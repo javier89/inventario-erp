@@ -10,6 +10,7 @@ import empleadosTypeDefs from "./schemas/empleados.schema.js";
 import movimientosTypeDefs from "./schemas/movimientos.schema.js"
 import asignacionesTypeDefs from "./schemas/asignaciones.schema.js";
 import comprasTypeDefs from "./schemas/compras.schema.js";
+
     
 // ----- Resolvers -----
 import productoResolver from "./resolvers/productos.resolver.js";

@@ -2,13 +2,14 @@ import {gql} from "graphql-tag";
 
 const proveedorTypeDefs = gql`
     type Proveedor {
-        id: ID!
+        id_proveedor: ID!
         nombre: String!
         email: String
         telefono: String
-        activo: Boolean!
-        createdAt: String!
-        updatedAt: String!
+        direccion: String
+        rfc: String
+        contacto_ventas: String
+        estado: String
     }
 
         # --------
@@ -18,12 +19,20 @@ const proveedorTypeDefs = gql`
         nombre: String
         email: String
         telefono: String
+        direccion: String
+        rfc: String
+        contact_ventas: String
+        estado: String
+
     }
         input ActualizarProveedorInput{
             nombre: String
             email: String 
             telefono: String
-            activo: Boolean
+            direccion: String
+            rfc: String
+            contacto_ventas: String
+            estado: String
         }
 
         # --------
@@ -31,7 +40,7 @@ const proveedorTypeDefs = gql`
         # --------
     extend type Query{
         proveedores: [Proveedor!]!
-        proveedor (id: ID!): Proveedor
+        proveedor (id_proveedor: ID!): Proveedor
     }
     
         # --------
@@ -40,10 +49,10 @@ const proveedorTypeDefs = gql`
     extend type Mutation{
         crearProveedor(data: CrearProveedorInput!): Proveedor!
         actualizarProveedor(
-            id: ID!
+            id_proveddor: ID!
             data: ActualizarProveedorInput!
         ): Proveedor!
-        eliminarProveedor(id: ID!): Boolean!
+        eliminarProveedor(id_proveedor: ID!): Boolean!
     }
 `;
 
