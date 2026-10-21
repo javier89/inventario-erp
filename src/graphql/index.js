@@ -10,7 +10,8 @@ import empleadosTypeDefs from "./schemas/empleados.schema.js";
 import movimientosTypeDefs from "./schemas/movimientos.schema.js"
 import asignacionesTypeDefs from "./schemas/asignaciones.schema.js";
 import comprasTypeDefs from "./schemas/compras.schema.js";
-
+import rolesTypeDefs from "./schemas/roles.schema.js";
+import permisosTypeDefs from "./schemas/permisos.schema.js";
     
 // ----- Resolvers -----
 import productoResolver from "./resolvers/productos.resolver.js";
@@ -20,14 +21,17 @@ import salidasResolver from "./resolvers/salida.resolver.js";
 import empleadosResolver from "./resolvers/empleados.resolver.js";
 import movimientosResolver from "./resolvers/movimientos.resolver.js";
 import asignacionesResolver from "./resolvers/asignaciones.resolver.js";
-import comprasResolver from "./resolvers/compras.resolver.js"
+import comprasResolver from "./resolvers/compras.resolver.js";
+import rolesResolver from "./resolvers/roles.resolver.js";
+import permisosResolver from "./resolvers/permisos.resolver.js";
 
 
 
 export const typeDefs = [
     baseTypeDefs,
     usuarioTypeDefs,
-    rolTypeDefs,
+    rolesTypeDefs,
+    permisosTypeDefs,
     productoTypeDfs,
     proveedorTypeDefs,
     loginTypeDefs,
@@ -36,6 +40,7 @@ export const typeDefs = [
     movimientosTypeDefs,
     asignacionesTypeDefs,
     comprasTypeDefs,
+
 ];
 
 
@@ -50,6 +55,8 @@ export const resolvers={
         ...(movimientosResolver.Query || {}),
         ...(asignacionesResolver.Query || {}),
         ...(comprasResolver.Query || {}),
+        ...(rolesResolver.Query || {}),
+        ...(permisosResolver.Query || {}),
     },
     Mutation: {
         ...(productoResolver.Mutation || {}),
@@ -60,6 +67,8 @@ export const resolvers={
         ...(movimientosResolver.Mutation || {}),
         ...(asignacionesResolver.Mutation || {}),
         ...(comprasResolver.Mutation || {}),
+        ...(rolesResolver.Mutation || {}),
+        ...(permisosResolver.Mutation || {}),
     },
 };
 

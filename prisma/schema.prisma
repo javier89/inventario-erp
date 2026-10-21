@@ -124,10 +124,12 @@ model Proveedor {
 }
 
 model Rol {
-  id_rol       Int       @id @default(autoincrement())
-  descriptcion String?   @db.VarChar(100)
-  nombre       String?   @unique @db.VarChar(100)
-  Usuario      Usuario[]
+  id_rol      Int          @id @default(autoincrement())
+  descripcion String?      @db.VarChar(100)
+  nombre      String?      @unique @db.VarChar(100)
+  activo      Boolean      @default(true)
+  RolPermiso  RolPermiso[]
+  Usuario     Usuario[]
 }
 
 model Usuario {
@@ -160,6 +162,26 @@ model Salida {
   motivo         String?          @db.VarChar(100)
   id_empleado    Int?
   Detalle_Salida Detalle_Salida[]
+}
+
+model Permisos {
+  id_permiso  Int          @id @default(autoincrement())
+  codigo      String       @unique(map: "codigo") @db.VarChar(100)
+  nombre      String       @db.VarChar(100)
+  descripcion String?      @db.VarChar(255)
+  modulo      String       @db.VarChar(100)
+  activo      Boolean?     @default(true)
+  RolPermiso  RolPermiso[]
+}
+
+model RolPermiso {
+  id_rol     Int
+  id_permiso Int
+  Permisos   Permisos @relation(fields: [id_permiso], references: [id_permiso], onDelete: Cascade, onUpdate: NoAction, map: "fk_rp_permiso")
+  Rol        Rol      @relation(fields: [id_rol], references: [id_rol], onDelete: Cascade, onUpdate: NoAction, map: "fk_rp_rol")
+
+  @@id([id_rol, id_permiso])
+  @@index([id_permiso], map: "fk_rp_permiso")
 }
 
 enum Movimiento_tipo_movimiento {
